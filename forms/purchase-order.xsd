@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://sipvs.example.sk/purchase-order"
+            targetNamespace="http://sipvs.example.sk/purchase-order"
+            elementFormDefault="qualified" version="1.0">
+
+	<xsd:element name="purchaseOrder" type="purchaseOrderType"/>
+
+	<xsd:complexType name="purchaseOrderType">
+		<xsd:sequence>
+			<xsd:element name="customerName" type="xsd:string"/>
+			<xsd:element name="customerEmail" type="emailType"/>
+			<xsd:element name="orderDate" type="xsd:date"/>
+			<xsd:element name="items" type="itemsType"/>
+			<xsd:element name="totalPrice" type="xsd:decimal"/>
+		</xsd:sequence>
+		<xsd:attribute name="currency" type="xsd:string" use="required"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="itemsType">
+		<xsd:sequence>
+			<xsd:element name="item" minOccurs="1" maxOccurs="unbounded" type="itemType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="itemType">
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string"/>
+			<xsd:element name="quantity" type="xsd:positiveInteger"/>
+			<xsd:element name="unit" type="unitType"/>
+			<xsd:element name="unitPrice" type="xsd:decimal"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="emailType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[^@\s]+@[^@\s]+\.[^@\s]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="unitType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ks"/>
+			<xsd:enumeration value="kg"/>
+			<xsd:enumeration value="m"/>
+			<xsd:enumeration value="hod"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

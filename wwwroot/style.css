@@ -1,0 +1,113 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #eee;
+}
+
+.paper {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 40px;
+    background: #fff;
+    border: 1px solid #999;
+}
+
+h1 {
+    text-align: center;
+    letter-spacing: 4px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+label input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 10px;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 4px;
+}
+
+td input, td select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input, select {
+    padding: 6px 8px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font: inherit;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2a6ebb;
+    box-shadow: 0 0 0 2px rgba(42, 110, 187, 0.2);
+}
+
+input:user-invalid {
+    border-color: #c00;
+}
+
+button {
+    padding: 8px 14px;
+    border: 1px solid #2a6ebb;
+    border-radius: 4px;
+    background: #fff;
+    color: #2a6ebb;
+    font: inherit;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #eaf1fa;
+}
+
+.actions button {
+    background: #2a6ebb;
+    color: #fff;
+}
+
+.actions button:hover {
+    background: #1f5799;
+}
+
+button.remove {
+    padding: 4px 8px;
+    border-color: #c00;
+    color: #c00;
+}
+
+button.remove:hover {
+    background: #fbeaea;
+}
+
+.total {
+    text-align: right;
+    font-size: 1.2em;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#result {
+    margin-top: 20px;
+    white-space: pre-line;
+}
+
+#result.error {
+    color: #c00;
+}

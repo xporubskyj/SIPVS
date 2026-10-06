@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <title>Objednávka</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <form id="order-form" class="paper">
+        <h1>OBJEDNÁVKA</h1>
+
+        <label>Odberateľ <input id="customer-name" required></label>
+        <label>E-mail <input id="customer-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" required></label>
+        <label>Dátum objednávky <input id="order-date" type="date" required></label>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Popis</th>
+                    <th>Množstvo</th>
+                    <th>MJ</th>
+                    <th>Jednotková cena (€)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="items"></tbody>
+        </table>
+        <button type="button" id="add-item">+ Pridať položku</button>
+
+        <p class="total">Celková cena: <strong id="total-price">0.00</strong> €</p>
+
+        <div class="actions">
+            <button type="button" id="save">Ulož XML</button>
+            <button type="button" id="validate">Over XML voči XSD</button>
+            <button type="button" id="transform">Transformuj XML do HTML</button>
+        </div>
+
+        <div id="result"></div>
+    </form>
+
+    <template id="item-template">
+        <tr>
+            <td><input class="description" required></td>
+            <td><input class="quantity" type="number" min="1" step="1" value="1" required></td>
+            <td>
+                <select class="unit">
+                    <option>ks</option>
+                    <option>kg</option>
+                    <option>m</option>
+                    <option>hod</option>
+                </select>
+            </td>
+            <td><input class="unit-price" type="number" min="0" step="0.01" required></td>
+            <td><button type="button" class="remove" title="Odstrániť položku">✕</button></td>
+        </tr>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
