@@ -27,7 +27,24 @@ app.MapPost("/api/transform", (XmlService xmlService) =>
     return Results.Ok(new { message = $"HTML bolo uložené: {xmlService.HtmlPath}" });
 });
 
+
 app.MapGet("/api/output/html", (XmlService xmlService) =>
     Results.File(xmlService.HtmlPath, "text/html; charset=utf-8"));
+
+app.MapGet("/api/forms/xsd", (XmlService s) =>
+    Results.Text(s.ReadXsd(), "application/xml; charset=utf-8"));
+
+app.MapGet("/api/forms/xsl", (XmlService s) =>
+    Results.Text(s.ReadXsl(), "application/xml; charset=utf-8"));
+
+app.MapPost("/api/save-asice", async (HttpRequest request, XmlService s) =>
+{
+    using var reader = new StreamReader(request.Body);
+    s.SaveAsice(await reader.ReadToEndAsync());
+    return Results.Ok(new { message = $"ASiC-E bolo uložené: {s.AsicePath}" });
+});
+
+app.MapGet("/api/output/asice", (XmlService s) =>
+    Results.File(s.AsicePath, "application/vnd.etsi.asic-e+zip", "purchase-order.asice"));
 
 app.Run();

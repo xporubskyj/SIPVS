@@ -5,6 +5,12 @@ const items = document.getElementById('items');
 const itemTemplate = document.getElementById('item-template');
 const totalPrice = document.getElementById('total-price');
 const result = document.getElementById('result');
+const XSD_REFERENCE = 'http://sipvs.example.sk/purchase-order/xsd/1.0';
+const XSL_REFERENCE = 'http://sipvs.example.sk/purchase-order/xsl/1.0';
+const PDF_FORMAT_ID = 'http://sipvs.example.sk/purchase-order/pdf/1.0';
+const SHA256 = 'http://www.w3.org/2001/04/xmlenc#sha256';
+const XML_FORMAT_ID = 'http://sipvs.example.sk/purchase-order/xml/1.0';
+const XDC_NAMESPACE = 'http://data.gov.sk/def/container/xmldatacontainer+xml/1.1';
 
 function addItem() {
     items.append(itemTemplate.content.cloneNode(true));
@@ -63,14 +69,87 @@ async function post(url, body) {
     return response.json();
 }
 
-function showResult(text, { link, isError = false } = {}) {
+// Profil XAdES_ZEPbp: v XMLData ani v schémach nesmie byť XML Declaration (a BOM)
+const stripDeclaration = text => text.replace(/^\uFEFF/, '').replace(/^\s*<\?xml[^>]*\?>\s*/, '');
+
+async function getText(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Nepodarilo sa načítať ${url}`);
+    return stripDeclaration(await response.text());
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = () => reject(new Error('PDF sa nepodarilo prečítať.'));
+        reader.readAsDataURL(file);
+    });
+}
+
+// Jediné miesto, kde voláme D.Bridge JS – tu prípadne upraviť parametre podľa príručky
+async function signWithDBridge({ xml, xsd, xsl, pdfBase64 }) {
+    const api = ditec.dSigXadesBpJs;
+    const step = (method, ...args) => new Promise((resolve, reject) =>
+        api[method](...args, {
+            onSuccess: resolve,
+            onError: e => reject(new Error(`D.Bridge (${method}): ${typeof e === 'string' ? e : e?.message ?? JSON.stringify(e)}`))
+        }));
+
+    await step('deploy', null);
+    await step('initialize');
+    await step('addXmlObject',
+    'xmlObject',                  // objectId
+    'Objednávka',                 // objectDescription
+    XML_FORMAT_ID,                // objectFormatIdentifier
+    xml,                          // xdcXMLData
+    NAMESPACE,                    // xdcIdentifier
+    '1.0',                        // xdcVersion
+    xsd,                          // xdcUsedXSD
+    XSD_REFERENCE,                // xsdReferenceURI
+    xsl,                          // xdcUsedXSLT
+    XSL_REFERENCE,                // xslReferenceURI
+    'HTML',                       // xslMediaDestinationTypeDescription
+    'sk',                         // xslXSLTLanguage
+    '',                           // xslTargetEnvironment
+    false,                        // xdcIncludeRefs
+    XDC_NAMESPACE);               // xdcNamespaceURI
+
+    await step('addPdfObject', 'pdfObject', 'Príloha PDF', pdfBase64, '', PDF_FORMAT_ID, '1B', false);
+    await step('sign', 'signatureId', SHA256, '');
+    return step('getSignatureWithASiCEnvelopeBase64');
+}
+
+onClick('sign', async () => {
+    if (!form.reportValidity()) return;
+    const file = document.getElementById('pdf-file').files[0];
+    if (!file) throw new Error('Vyber PDF súbor na podpis.');
+
+    showResult('Ukladám a overujem XML…');
+    const xml = buildXml();
+    await post('/api/save', xml);
+    const { isValid, errors } = await post('/api/validate');
+    if (!isValid) throw new Error(['XML nie je platné voči XSD:', ...errors].join('\n\n'));
+
+    const [xsd, xsl, pdfBase64] = await Promise.all([
+        getText('/api/forms/xsd'), getText('/api/forms/xsl'), readFileAsBase64(file)
+    ]);
+
+    showResult('Čakám na podpisovač (vyber certifikát)…');
+    const asiceBase64 = await signWithDBridge({ xml, xsd, xsl, pdfBase64 });
+
+    const { message } = await post('/api/save-asice', asiceBase64);
+    showResult(message, { link: `/api/output/asice?t=${Date.now()}`, linkText: 'Stiahnuť .asice' });
+});
+
+function showResult(text, { link, linkText = 'Otvoriť HTML', isError = false } = {}) {
     result.textContent = text;
     result.classList.toggle('error', isError);
     if (link) {
         const anchor = document.createElement('a');
         anchor.href = link;
         anchor.target = '_blank';
-        anchor.textContent = 'Otvoriť HTML';
+        anchor.textContent = linkText;
         result.append(' ', anchor);
     }
 }
@@ -79,11 +158,12 @@ function onClick(id, handler) {
     document.getElementById(id).addEventListener('click', async () => {
         try {
             await handler();
-        } catch {
-            showResult('Operácia zlyhala. Skontroluj, či je XML uložené.', { isError: true });
+        } catch (e) {
+            showResult(e.message || 'Operácia zlyhala. Skontroluj, či je XML uložené.', { isError: true });
         }
     });
 }
+
 
 onClick('save', async () => {
     if (!form.reportValidity()) return;

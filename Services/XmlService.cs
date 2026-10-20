@@ -12,6 +12,7 @@ public class XmlService(string rootPath)
 
     public string XmlPath { get; } = Path.Combine(rootPath, "output", "purchase-order.xml");
     public string HtmlPath { get; } = Path.Combine(rootPath, "output", "purchase-order.html");
+    public string AsicePath { get; } = Path.Combine(rootPath, "output", "purchase-order.asice");
 
     public void Save(string xml)
     {
@@ -46,5 +47,15 @@ public class XmlService(string rootPath)
         var transform = new XslCompiledTransform();
         transform.Load(_xslPath);
         transform.Transform(XmlPath, HtmlPath);
+    }
+
+    public string ReadXsd() => File.ReadAllText(_xsdPath);
+
+    public string ReadXsl() => File.ReadAllText(_xslPath);
+
+    public void SaveAsice(string base64)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(AsicePath)!);
+        File.WriteAllBytes(AsicePath, Convert.FromBase64String(base64.Trim()));
     }
 }

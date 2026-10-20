@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Objednávka</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/config.js"></script>
+    <script src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/dCommon.min.js"></script>
+    <script src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/dSigXadesBp.min.js"></script>
 </head>
 <body>
     <form id="order-form" class="paper">
@@ -29,10 +32,15 @@
 
         <p class="total">Celková cena: <strong id="total-price">0.00</strong> €</p>
 
+         <label>PDF príloha na podpis (PDF 1.4 / PDF/A-1)
+            <input id="pdf-file" type="file" accept="application/pdf">
+        </label>
+
         <div class="actions">
             <button type="button" id="save">Ulož XML</button>
             <button type="button" id="validate">Over XML voči XSD</button>
             <button type="button" id="transform">Transformuj XML do HTML</button>
+            <button type="button" id="sign">Podpísať</button>
         </div>
 
         <div id="result"></div>
