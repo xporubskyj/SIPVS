@@ -69,7 +69,7 @@ async function post(url, body) {
     return response.json();
 }
 
-// Profil XAdES_ZEPbp: v XMLData ani v schémach nesmie byť XML Declaration (a BOM)
+
 const stripDeclaration = text => text.replace(/^\uFEFF/, '').replace(/^\s*<\?xml[^>]*\?>\s*/, '');
 
 async function getText(url) {
@@ -87,7 +87,7 @@ function readFileAsBase64(file) {
     });
 }
 
-// Jediné miesto, kde voláme D.Bridge JS – tu prípadne upraviť parametre podľa príručky
+
 async function signWithDBridge({ xml, xsd, xsl, pdfBase64 }) {
     const api = ditec.dSigXadesBpJs;
     const step = (method, ...args) => new Promise((resolve, reject) =>
@@ -115,7 +115,7 @@ async function signWithDBridge({ xml, xsd, xsl, pdfBase64 }) {
     false,                        
     XDC_NAMESPACE);               
 
-    await step('addPdfObject', 'pdfObject', 'Príloha PDF', pdfBase64, '', PDF_FORMAT_ID, '1B', false);
+    await step('addPdfObject', 'pdfObject', 'Príloha PDF', pdfBase64, '', PDF_FORMAT_ID, 2, false);
     await step('sign', 'signatureId', SHA256, '');
     return step('getSignatureWithASiCEnvelopeBase64');
 }
