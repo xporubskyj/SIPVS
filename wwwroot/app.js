@@ -99,21 +99,21 @@ async function signWithDBridge({ xml, xsd, xsl, pdfBase64 }) {
     await step('deploy', null);
     await step('initialize');
     await step('addXmlObject',
-    'xmlObject',                  // objectId
-    'Objednávka',                 // objectDescription
-    XML_FORMAT_ID,                // objectFormatIdentifier
-    xml,                          // xdcXMLData
-    NAMESPACE,                    // xdcIdentifier
-    '1.0',                        // xdcVersion
-    xsd,                          // xdcUsedXSD
-    XSD_REFERENCE,                // xsdReferenceURI
-    xsl,                          // xdcUsedXSLT
-    XSL_REFERENCE,                // xslReferenceURI
-    'HTML',                       // xslMediaDestinationTypeDescription
-    'sk',                         // xslXSLTLanguage
-    '',                           // xslTargetEnvironment
-    false,                        // xdcIncludeRefs
-    XDC_NAMESPACE);               // xdcNamespaceURI
+    'xmlObject',                  
+    'Objednávka',                 
+    XML_FORMAT_ID,                
+    xml,                          
+    NAMESPACE,                    
+    '1.0',                        
+    xsd,                          
+    XSD_REFERENCE,                
+    xsl,                          
+    XSL_REFERENCE,                
+    'HTML',                       
+    'sk',                         
+    '',                           
+    false,                        
+    XDC_NAMESPACE);               
 
     await step('addPdfObject', 'pdfObject', 'Príloha PDF', pdfBase64, '', PDF_FORMAT_ID, '1B', false);
     await step('sign', 'signatureId', SHA256, '');
