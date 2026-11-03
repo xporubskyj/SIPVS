@@ -13,6 +13,7 @@ public class XmlService(string rootPath)
     public string XmlPath { get; } = Path.Combine(rootPath, "output", "purchase-order.xml");
     public string HtmlPath { get; } = Path.Combine(rootPath, "output", "purchase-order.html");
     public string AsicePath { get; } = Path.Combine(rootPath, "output", "purchase-order.asice");
+    public string AsiceTPath { get; } = Path.Combine(rootPath, "output", "purchase-order-xades-t.asice");
 
     public void Save(string xml)
     {

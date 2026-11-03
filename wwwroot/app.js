@@ -65,7 +65,10 @@ function buildXml() {
 
 async function post(url, body) {
     const response = await fetch(url, { method: 'POST', body });
-    if (!response.ok) throw new Error();
+    if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.message);
+    }
     return response.json();
 }
 
@@ -183,6 +186,17 @@ onClick('validate', async () => {
 onClick('transform', async () => {
     const { message } = await post('/api/transform');
     showResult(message, { link: `/api/output/html?t=${Date.now()}` });
+});
+
+onClick('timestamp', async () => {
+    showResult('Žiadam o časovú pečiatku…');
+    const { message, time, tsa, serialNumber, tsaUrl } = await post('/api/timestamp');
+    showResult(
+        `${message}
+Čas: ${new Date(time).toLocaleString('sk-SK')}
+TSA: ${tsa} (${tsaUrl})
+Sériové číslo: ${serialNumber}`,
+        { link: `/api/output/asice-t?t=${Date.now()}`, linkText: 'Stiahnuť XAdES-T .asice' });
 });
 
 document.getElementById('add-item').addEventListener('click', addItem);

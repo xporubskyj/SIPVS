@@ -2,6 +2,10 @@ using SipvsApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(new XmlService(builder.Environment.ContentRootPath));
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton(sp => new TimestampService(
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient(),
+    builder.Configuration["Tsa:Url"] ?? "http://timestamp.digicert.com"));
 
 var app = builder.Build();
 
@@ -46,5 +50,28 @@ app.MapPost("/api/save-asice", async (HttpRequest request, XmlService s) =>
 
 app.MapGet("/api/output/asice", (XmlService s) =>
     Results.File(s.AsicePath, "application/vnd.etsi.asic-e+zip", "purchase-order.asice"));
+
+app.MapPost("/api/timestamp", async (XmlService s, TimestampService tsa) =>
+{
+    try
+    {
+        var result = await tsa.ExtendToXadesTAsync(s.AsicePath, s.AsiceTPath);
+        return Results.Ok(new
+        {
+            message = $"XAdES-T bolo uložené: {s.AsiceTPath}",
+            time = result.Time,
+            tsa = result.TsaSubject,
+            serialNumber = result.SerialNumber,
+            tsaUrl = tsa.TsaUrl
+        });
+    }
+    catch (InvalidOperationException e)
+    {
+        return Results.BadRequest(new { message = e.Message });
+    }
+});
+
+app.MapGet("/api/output/asice-t", (XmlService s) =>
+    Results.File(s.AsiceTPath, "application/vnd.etsi.asic-e+zip", "purchase-order-xades-t.asice"));
 
 app.Run();

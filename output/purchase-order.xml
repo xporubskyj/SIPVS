@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <purchaseOrder xmlns="http://sipvs.example.sk/purchase-order" currency="EUR">
-  <customerName>jozko</customerName>
-  <customerEmail>mrkvicka@mail.com</customerEmail>
-  <orderDate>2026-10-21</orderDate>
+  <customerName>a</customerName>
+  <customerEmail>a@b.c</customerEmail>
+  <orderDate>2026-11-03</orderDate>
   <items>
     <item>
-      <description>ceruzka</description>
+      <description>123</description>
       <quantity>1</quantity>
       <unit>ks</unit>
-      <unitPrice>1.00</unitPrice>
+      <unitPrice>123.00</unitPrice>
     </item>
   </items>
-  <totalPrice>1.00</totalPrice>
+  <totalPrice>123.00</totalPrice>
 </purchaseOrder>
